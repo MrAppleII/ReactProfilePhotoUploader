@@ -95,7 +95,6 @@ class UploadProfilePhoto extends Component {
    
     ImageSrc.onload = async () => {
       var crop_canvas = document.createElement("canvas")
-      console.log(crop_canvas)
       crop_canvas.style.display = "hidden"
       crop_canvas.getContext("2d", { alpha: false })
 
@@ -152,9 +151,17 @@ class UploadProfilePhoto extends Component {
       while (n--) {
         u8arr[n] = bstr.charCodeAt(n)
       }
+
+      // TODO Here is where the backend work needs to be added. 
+
+
+      // Here is the file that will be pushed to the back end!!
       var ourPNGfile = await new File([u8arr], fileName, { type: mime })
       // Here is our new PNG file with the new filename as well.
-      console.log("new File", ourPNGfile)
+
+
+
+     
       /*
       // Use only for demo or testing purposes. 
       var win = window.open()
