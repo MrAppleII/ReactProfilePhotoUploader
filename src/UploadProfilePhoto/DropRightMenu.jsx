@@ -23,59 +23,51 @@ class DropdownMenu extends Component {
       isFirstRun: true,
       windowWidth: null,
       windowHeight: null,
-      menuYTranslate:0,
+      menuYTranslate: 0,
       menuWidth: null,
-      menuTranslate: -(this.props.width/2),
+      menuTranslate: -(this.props.width / 2),
     }
     this.menuWindow = React.createRef()
-    
   }
   componentDidMount() {
-    
     window.addEventListener("resize", this.handleResize)
-
-   
-
   }
   //***************************
-  checkOutsideHandle = (e) =>{
-    if(this.menuWindow.current!=null){
-    if (!this.menuWindow.current.contains(e.target)&&this.menuWindow) {
-      if(this.props.isVisible){
-        this.props.onMenuClose()
-    
-      }  
-    }
+  checkOutsideHandle = e => {
+    if (this.menuWindow.current != null) {
+      if (!this.menuWindow.current.contains(e.target) && this.menuWindow) {
+        if (this.props.isVisible) {
+          this.props.onMenuClose()
+        }
+      }
     }
   }
   //***************************
   componentWillUnmount() {
-
     window.removeEventListener("resize", this.handleResize)
   }
-  handleResize = event =>{
-    try{
+  handleResize = event => {
+    try {
       if (this.menuWindow.current != null) {
         this.setState({
           isFirstRun: true,
         })
-        this.checkTranslate();
+        this.checkTranslate()
         this.setState({
           isFirstRun: false,
         })
       }
-    }catch(e){
-  if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+    } catch (e) {
+      if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
         console.log(e)
-      
-    }}
-  
+      }
+    }
   }
 
   checkTranslate = () => {
-   // Add this for mouse events
+    // Add this for mouse events
 
-    try{
+    try {
       if (this.state.isFirstRun) {
         var mWidth =
           this.menuWindow.current.getBoundingClientRect().right -
@@ -87,12 +79,15 @@ class DropdownMenu extends Component {
         })
 
         var mHeight = this.menuWindow.current.scrollHeight
-       
-        if(this.state.menuYTranslate === 0 || this.state.menuYTranslate!==mHeight){
+
+        if (
+          this.state.menuYTranslate === 0 ||
+          this.state.menuYTranslate !== mHeight
+        ) {
           // console.log(this.menuWindow.current.scrollHeight)
-         this.setState({
-             menuYTranslate:-1*(this.menuWindow.current.scrollHeight),
-            })
+          this.setState({
+            menuYTranslate: -1 * this.menuWindow.current.scrollHeight,
+          })
         }
 
         var rightSideDistance = ~~(
@@ -127,11 +122,11 @@ class DropdownMenu extends Component {
           })
         }
       }
-    }catch(e){
+    } catch (e) {
       if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-            console.log(e)
-          
-        }}
+        console.log(e)
+      }
+    }
   }
 
   ChangeFirstRun = () => {
@@ -143,15 +138,13 @@ class DropdownMenu extends Component {
     })
   }
   //***************************
-  AddListener = () =>{
-       window.addEventListener('click', this.checkOutsideHandle, false);
-
+  AddListener = () => {
+    window.addEventListener("click", this.checkOutsideHandle, false)
   }
-  RemoveListener = () =>{
-    window.removeEventListener('click', this.checkOutsideHandle, false);
-
+  RemoveListener = () => {
+    window.removeEventListener("click", this.checkOutsideHandle, false)
   }
-//***************************
+  //***************************
   render() {
     try {
       return this.props.isVisible ? (
@@ -160,54 +153,49 @@ class DropdownMenu extends Component {
           onAnimationEnd={this.ChangeFirstRun}
           style={{ visibility: "show" }}
           className="show"
-          
         >
-          <TriangleTop 
-          //***************************
-          onClick={e => {
-            // We are simply preventing the e based function up above from misfiring
-            e.stopPropagation()
-          
-          }}
-          style={{
-             
-         zIndex:1,
-        }}
-/>
+          <TriangleTop
+            //***************************
+            onClick={e => {
+              // We are simply preventing the e based function up above from misfiring
+              e.stopPropagation()
+            }}
+            style={{
+              zIndex: 1,
+            }}
+          />
           <MainContainer
-          //***************************
-          onClick={e => {
-            // We are simply preventing the e based function up above from misfiring
-            e.stopPropagation()
-          }}
-          //***************************
-          padding={this.props.padding}
+            //***************************
+            onClick={e => {
+              // We are simply preventing the e based function up above from misfiring
+              e.stopPropagation()
+            }}
+            //***************************
+            padding={this.props.padding}
             ref={this.menuWindow}
             style={{
-               
-                transform:" translateX(50%) translateX(17px) ",
-              width:""+this.props.width+"px",
-              top:""+(this.state.menuYTranslate/2)+"px",
+              transform: " translateX(50%) translateX(17px) ",
+              width: "" + this.props.width + "px",
+              top: "" + this.state.menuYTranslate / 2 + "px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
           </MainContainer>
-          
         </Wrapper>
-
       ) : !this.state.isFirstRun ? (
-        <Wrapper className="hide"  
-        //***************************
-         onAnimationEnd={this.RemoveListener}
-         //***************************
-         >
+        <Wrapper
+          className="hide"
+          //***************************
+          onAnimationEnd={this.RemoveListener}
+          //***************************
+        >
           <TriangleTop />
           <MainContainer
-           padding={this.props.padding}
+            padding={this.props.padding}
             style={{
-                transform:" translateX(50%) translateX(17px) ",
-                width:""+this.props.width+"px",
-                top:""+(this.state.menuYTranslate/2)+"px",
+              transform: " translateX(50%) translateX(17px) ",
+              width: "" + this.props.width + "px",
+              top: "" + this.state.menuYTranslate / 2 + "px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
@@ -277,7 +265,7 @@ const MainContainer = styled.div`
 
   
 
- /* width: ${props => `"`+props.width+`px` || "390px"}; */
+ /* width: ${props => `"` + props.width + `px` || "390px"}; */
   
   transform-origin: 0% 0%;
   will-change: transform, opacity;
@@ -291,7 +279,7 @@ const MainContainer = styled.div`
   flex-direction: column;
   vertical-align: baseline;
   justify-content: center;
-
+  z-index:3;
   /* Padding */
   padding:  ${props => props.padding || "20px"};;
 
@@ -301,66 +289,52 @@ const MainContainer = styled.div`
   color: #000;
 `
 const Wrapper = styled.div`
-position:relative;
-/* positioning */
-filter: drop-shadow( 1.5px 1.5px 2px rgba(0, 0, 0, 0.45));
+  position: relative;
+  /* positioning */
+  filter: drop-shadow(1.5px 1.5px 2px rgba(0, 0, 0, 0.45));
 
+  margin-bottom: auto;
+  margin-top: auto;
+  /* Visibility */
+  visibility: hidden;
 
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  vertical-align: baseline;
 
+  height: 0;
+  z-index: 500;
+  width: 0;
+  will-change: transform, opacity;
 
-
-margin-bottom:auto;
-margin-top:auto;
-/* Visibility */
-visibility: hidden;
-
-
-display:flex;
-flex-direction:row;
-justify-content:center;
-align-items:center;
-vertical-align:baseline;
-
-
-height:0;
-z-index:500;
-width:0;
-will-change: transform, opacity;
-
-/* Animations :D */
-&.show {
-  
-  visibility: visible !important;
-  animation: ${FadeIn} 0.15s ease-in;
-}
-&.hide {
-  animation: ${FadeOut} 0.15s ease-in;
-}
-
+  /* Animations :D */
+  &.show {
+    visibility: visible !important;
+    animation: ${FadeIn} 0.15s ease-in;
+  }
+  &.hide {
+    animation: ${FadeOut} 0.15s ease-in;
+  }
 `
 const InnerChildContainer = styled.div`
- position: relative;
+  position: relative;
   align-items: center;
   flex: 1;
   vertical-align: baseline;
-
-
-
 `
 
 const TriangleTop = styled.div`
   /* dimensions */
   width: 25px;
   height: 25px;
- 
 
   background: ${props => props.containerColor || "white"};
 
   /* transforms */
   transform-origin: center;
-  transform: translateX(25%)  translateY(50%)  rotate(45deg) ;
-  
-
+  transform: translateX(25%) translateY(50%) rotate(45deg);
 
   will-change: transform, opacity;
 
@@ -368,9 +342,8 @@ const TriangleTop = styled.div`
   position: absolute;
   z-index: 1;
   left: 0;
-  bottom:0;
+  bottom: 0;
   right: auto;
- 
 
   /* Borders */
   border-radius: 1px;
@@ -390,9 +363,9 @@ DropdownMenu.propTypes = {
 }
 DropdownMenu.defaultProps = {
   isVisible: false,
-  width:290,
-  
+  width: 200,
+
   // ***************************
-  onMenuClose: function(){}
+  onMenuClose: function() {},
   //*************************** */
 }

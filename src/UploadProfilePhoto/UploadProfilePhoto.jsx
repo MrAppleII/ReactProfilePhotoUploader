@@ -13,9 +13,6 @@ import MenuHolder from "./DropRightMenu"
   showMenu: PropTypes.bool, 
   image: PropTypes.node.isRequired,
   size:PropTypes.number,
-
-
-
 */
 
 class UploadProfilePhoto extends Component {
@@ -29,7 +26,7 @@ class UploadProfilePhoto extends Component {
       imgWidth: 0,
       imgHeight: 0,
       // **********
-      minSize: 200,
+      minSize: 150,
       // ***** This is the size of the preview image
       rangeRatio: 100,
       // ***** This is just used for zooming in and out.
@@ -55,8 +52,8 @@ class UploadProfilePhoto extends Component {
       value: 0,
       previewVisible: false,
 
-      // Whether or not to show the menu 
-      isMenuVisible:false,
+      // Whether or not to show the menu
+      isMenuVisible: false,
     }
     this.timer = null
     this.checkResize = this.checkResize.bind(this)
@@ -66,7 +63,7 @@ class UploadProfilePhoto extends Component {
     this.debounce = this.debounce.bind(this)
     this.acceptButtonHandler = this.acceptButtonHandler.bind(this)
   }
-  menuToggler = () =>{
+  menuToggler = () => {
     this.setState({
       isMenuVisible: !this.state.isMenuVisible,
     })
@@ -77,7 +74,7 @@ class UploadProfilePhoto extends Component {
     this.dragImg.src =
       "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
   }
- 
+
   componentWillUnmount() {}
 
   overrideEventDefaults = e => {
@@ -85,14 +82,14 @@ class UploadProfilePhoto extends Component {
     e.stopPropagation()
   }
 
-  acceptButtonHandler(){
+  acceptButtonHandler() {
     var ImageSrc = new Image()
     ImageSrc.style.display = "none"
 
     ImageSrc.src = this.state.fileURL
     ImageSrc.width = this.state.imgWidth
     ImageSrc.height = this.state.imgHeight
-   
+
     ImageSrc.onload = async () => {
       var crop_canvas = document.createElement("canvas")
       crop_canvas.style.display = "hidden"
@@ -152,16 +149,13 @@ class UploadProfilePhoto extends Component {
         u8arr[n] = bstr.charCodeAt(n)
       }
 
-      // TODO Here is where the backend work needs to be added. 
-
+      // TODO Here is where the backend work needs to be added.
 
       // Here is the file that will be pushed to the back end!!
       var ourPNGfile = await new File([u8arr], fileName, { type: mime })
       // Here is our new PNG file with the new filename as well.
-
-
-
-     
+      this.props.updatedFile(ourPNGfile)
+      this.menuToggler()
       /*
       // Use only for demo or testing purposes. 
       var win = window.open()
@@ -172,7 +166,6 @@ class UploadProfilePhoto extends Component {
       )
         */
     }
-   
   }
 
   componentDidUpdate() {
@@ -229,8 +222,8 @@ class UploadProfilePhoto extends Component {
             isLoading: false,
             imgWidth: img.width,
             imgHeight: img.height,
-            previewWidth: img.width * (minValue / 100),
-            previewHeight: img.height * (minValue / 100),
+            previewWidth: img.width * (minValue / (this.state.minSize/2)),
+            previewHeight: img.height * (minValue / (this.state.minSize/2)),
             previewVisible: true,
             previewMinValue: minValue,
             previewMaxValue: MaxVal,
@@ -290,7 +283,7 @@ class UploadProfilePhoto extends Component {
         this.checkResize()
       }
     )
-  }, 2)
+  }, 1)
   handleImageDragStart(event) {
     event.dataTransfer.setData("text/plain", null)
     event.dataTransfer.setDragImage(this.dragImg, 0, 0)
@@ -320,13 +313,12 @@ class UploadProfilePhoto extends Component {
     if (this.state.previewPosY <= -1 * maxYTrans) {
       newY = -1 * maxYTrans
     }
-    if(this.state.previewPosX!== newX || this.state.previewPosY !== newY){
+    if (this.state.previewPosX !== newX || this.state.previewPosY !== newY) {
       this.setState({
         previewPosX: newX,
         previewPosY: newY,
       })
     }
-  
   }
 
   handleImageDrag = this.debounce((clientX, clientY) => {
@@ -424,8 +416,16 @@ class UploadProfilePhoto extends Component {
     try {
       return (
         <Container>
-          <ProfilePhoto onClick={this.menuToggler} imageSrc={this.props.image} size={this.props.size} />
-          <MenuHolder onMenuClose={this.cancelButtonHandler} padding="19px" isVisible={this.state.isMenuVisible}>
+          <ProfilePhoto
+            onClick={this.menuToggler}
+            imageSrc={this.props.image}
+            size={this.props.size}
+          />
+          <MenuHolder
+            onMenuClose={this.cancelButtonHandler}
+            padding="19px"
+            isVisible={this.state.isMenuVisible}
+          >
             <UploadBoxContainer>
               <HeaderText>Choose Photo</HeaderText>
               <UploadCircle>
@@ -496,10 +496,7 @@ class UploadProfilePhoto extends Component {
               value={this.state.value}
             />
             <ButtonContainer>
-              <MenuButton
-                className="cancel"
-                onClick={this.props.cancelButtonHandler}
-              >
+              <MenuButton className="cancel" onClick={this.menuToggler}>
                 Cancel
               </MenuButton>
               <MenuButton onClick={this.acceptButtonHandler}>Accept</MenuButton>
@@ -547,7 +544,6 @@ const SizeSelector = styled.input`
 `
 const CustomInput = styled.input`
   cursor: auto !important;
-  
 `
 const DropContainer = styled.div`
   width: 100%;
@@ -577,12 +573,13 @@ const Container = styled.div`
 const ImagePreview = styled.img`
   max-width: none;
   max-height: none;
-  z-index:2;
+  z-index: 2;
+  background-color: white;
   transform-origin: center;
   outline: none;
   position: absolute;
   transition-property: width, height;
-  transition-duration: 0.16s;
+  transition-duration: 0.04s;
   transition-delay: 0s;
   overflow: hidden;
   transition-timing-function: linear;
@@ -596,6 +593,7 @@ const UploadBoxContainer = styled.div`
   align-content: center;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 0.4em;
 `
 
 // This is for the outline of our Image Preview
@@ -604,11 +602,10 @@ const UploadCircle = styled.div`
   border-radius: 50%;
   border-width: 2px;
   border-color: rgba(0, 0, 0, 0.3);
-  box-shadow: 0 1.5px 3px 0 rgba(0, 0, 0, 0.15),
-    0 1.5px 3px 0 rgba(0, 0, 0, 0.15);
 
-  height: 200px;
-  width: 200px;
+  /* this adjusts the size of the preview windows */
+  height: 150px;
+  width: 150px;
   overflow: hidden !important;
   display: flex;
   flex-direction: row;
@@ -620,7 +617,7 @@ const UploadCircle = styled.div`
   cursor: default !important;
 `
 const InnerCircleText = styled.p`
-  line-height:1.4em;
+  line-height: 1.4em;
   text-align: center;
   position: absolute;
   outline: none !important;
@@ -637,7 +634,7 @@ const ButtonContainer = styled.div`
   margin-top: 0.8em;
   margin-bottom: 0.1em;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   align-content: center;
 `
@@ -647,8 +644,8 @@ const MenuButton = styled.button`
   border: 0;
   cursor: pointer;
   justify-content: center;
-  padding-left: 18px;
-  padding-right: 18px;
+  padding-left: 14px;
+  padding-right: 14px;
   flex-grow: 0;
   -webkit-box-pack: center;
   display: flex;
@@ -659,33 +656,33 @@ const MenuButton = styled.button`
   border: 0px solid black;
   outline: none;
   max-height: 32px !important;
-  min-width: 120px;
-  margin-left: 10px !important;
+
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
   color: ${props => (props.textcolor ? props.textcolor : "#000")};
-
+  color: rgba(38, 38, 38, 0.75) !important;
   &.cancel {
-    color: black;
-    background-color: transparent;
-    border-color: transparent;
-  }
-  background-color: ${props =>
-    props.color ? props.color : "rgb(255, 236, 6);"};
+    color: #262626;
+    color: rgba(38, 38, 38, 0.5) !important;
+    border: 1px solid rgba(38, 38, 38, 0.15);
 
-  :active {
+    background: transparent;
+  }
+
+  /* :active {
     outline: none;
     transition: all 0.3s ease 0s;
     transform: scale(0.95);
-  }
+  } */
   :disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 `
 const HeaderText = styled.p`
-  font-weight: 100;
+  font-weight: 400;
+  color: rgba(38, 38, 38, 0.4) !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   font-size: 1.1em;
